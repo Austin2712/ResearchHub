@@ -70,7 +70,6 @@ interface Activity {
 
 export default function CollaborationHub() {
   const [activeTab, setActiveTab] = useState<string>('projects')
-  const [selectedProject, setSelectedProject] = useState<string>('1')
 
   const teamMembers: TeamMember[] = [
     {

@@ -124,7 +124,7 @@ export interface AIConversation {
   id: string
   user_id: string
   document_id?: string
-  messages: any[]
+  messages: Record<string, unknown>[]
   task_type: 'writing' | 'citation' | 'grammar' | 'abstract' | 'review'
   created_at: string
   updated_at: string

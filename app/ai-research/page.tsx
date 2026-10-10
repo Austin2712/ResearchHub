@@ -1,5 +1,6 @@
+'use client'
 import Navigation from '@/components/Navigation'
-import AIResearchAssistant from '@/components/AIResearchAssistant'
+import { AIResearchAssistant } from '@/components/AIResearchAssistant'
 
 export default function AIResearchPage() {
   return (

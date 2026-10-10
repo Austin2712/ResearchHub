@@ -1,6 +1,6 @@
 'use client'
 import { useState } from 'react'
-import { BarChart3, TrendingUp, Users, Target, Calendar, Award, BookOpen, Zap, Eye, Download, Filter, Search } from 'lucide-react'
+import { BarChart3, TrendingUp, Users, Target, Calendar, Award, BookOpen, Zap, Eye, Download, Filter, Search, LucideIcon } from 'lucide-react'
 import Button from './ui/Button'
 
 interface MetricCard {
@@ -8,7 +8,7 @@ interface MetricCard {
   value: string
   change: string
   trend: 'up' | 'down' | 'neutral'
-  icon: any
+  icon: LucideIcon
   color: string
 }
 
@@ -462,7 +462,7 @@ export default function ResearchAnalytics() {
                     <div>
                       <p className="font-medium text-blue-900">Emerging Gap Detected</p>
                       <p className="text-sm text-blue-700 mt-1">
-                        Limited research on "Quantum NLP" - high potential for impact
+                        Limited research on &quot;Quantum NLP&quot; - high potential for impact - high potential for impact
                       </p>
                     </div>
                   </div>
@@ -473,7 +473,7 @@ export default function ResearchAnalytics() {
                     <div>
                       <p className="font-medium text-green-900">Collaboration Opportunity</p>
                       <p className="text-sm text-green-700 mt-1">
-                        Dr. Chen's research aligns 94% with your recent work
+                        Dr. Chen&apos;s research aligns 94% with your recent work
                       </p>
                     </div>
                   </div>

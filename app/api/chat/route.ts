@@ -2,7 +2,8 @@ import { GoogleGenerativeAI } from '@google/generative-ai'
 import { NextRequest, NextResponse } from 'next/server'
 
 // Initialize Gemini AI
-const genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_API_KEY!)
+const apiKey = process.env.GOOGLE_AI_API_KEY || process.env.GEMINI_API_KEY || ''
+const genAI = new GoogleGenerativeAI(apiKey)
 
 export async function POST(request: NextRequest) {
   try {
@@ -15,7 +16,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    if (!process.env.GOOGLE_AI_API_KEY) {
+    if (!apiKey) {
       return NextResponse.json(
         { error: 'Gemini API key not configured' },
         { status: 500 }
@@ -23,7 +24,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Get the generative model
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' })
+    const model = genAI.getGenerativeModel({ model: 'gemini-3.8-flash' })
 
     // Create a comprehensive research-focused prompt
     const systemPrompt = `You are an expert AI Research Assistant specialized in academic research and scholarly work. You help researchers with:
@@ -63,7 +64,7 @@ Please provide a comprehensive, helpful response that addresses the user's resea
     return NextResponse.json({
       response: text,
       timestamp: new Date().toISOString(),
-      model: 'gemini-1.5-flash'
+      model: 'gemini-3.8-flash'
     })
 
   } catch (error) {

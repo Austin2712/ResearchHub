@@ -1,11 +1,20 @@
 import { GoogleGenerativeAI } from '@google/generative-ai'
 import { NextRequest, NextResponse } from 'next/server'
 
-const genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_API_KEY!)
+interface WritingSuggestion {
+  id?: string
+  type?: string
+  text?: string
+  confidence?: number
+  position?: number
+}
+
+const apiKey = process.env.GOOGLE_AI_API_KEY || process.env.GEMINI_API_KEY || ''
+const genAI = new GoogleGenerativeAI(apiKey)
 
 export async function POST(request: NextRequest) {
   try {
-    const { content, position, type, context } = await request.json()
+    const { content, position, type } = await request.json()
 
     if (!content || !content.trim()) {
       return NextResponse.json(
@@ -14,17 +23,17 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    if (!process.env.GOOGLE_AI_API_KEY) {
+    if (!apiKey) {
       return NextResponse.json(
         { error: 'Gemini API key not configured' },
         { status: 500 }
       )
     }
 
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' })
+    const model = genAI.getGenerativeModel({ model: 'gemini-3.8-flash' })
 
-    let prompt = ''
-    
+    let prompt = 'any'
+
     switch (type) {
       case 'suggestions':
         prompt = `As an expert academic writing assistant, analyze this text and provide 3 helpful suggestions:
@@ -113,13 +122,15 @@ Give constructive suggestions for improvement in academic writing style.`
 
     const result = await model.generateContent(prompt)
     const response = await result.response
-    let text = response.text()
+    const text = response.text()
 
     // Try to parse JSON response
-    let suggestions = []
+    let suggestions: WritingSuggestion[] = []
     try {
       // Clean up the response to extract JSON
-      const jsonMatch = text.match(/\[[\s\S]*\]/) || text.match(/\{[\s\S]*\}/)
+      const jsonMatch =
+        text.match(/\[[\s\S]*\]/) ||
+        text.match(/\{[\s\S]*\}/)
       if (jsonMatch) {
         const jsonText = jsonMatch[0]
         suggestions = JSON.parse(jsonText)
@@ -132,7 +143,7 @@ Give constructive suggestions for improvement in academic writing style.`
           confidence: 85
         }]
       }
-    } catch (parseError) {
+    } catch {
       // If JSON parsing fails, create a structured response
       suggestions = [{
         id: `suggestion_${Date.now()}`,
@@ -148,7 +159,7 @@ Give constructive suggestions for improvement in academic writing style.`
     }
 
     // Add unique IDs if missing
-    suggestions = suggestions.map((suggestion, index) => ({
+    suggestions = suggestions.map((suggestion: WritingSuggestion, index: number) => ({
       id: suggestion.id || `suggestion_${Date.now()}_${index}`,
       type: suggestion.type || 'general',
       text: suggestion.text || suggestion.toString(),
@@ -159,13 +170,13 @@ Give constructive suggestions for improvement in academic writing style.`
     return NextResponse.json({
       suggestions,
       timestamp: new Date().toISOString(),
-      model: 'gemini-1.5-flash',
+      model: 'gemini-3.8-flash',
       type
     })
 
   } catch (error) {
     console.error('Writing Assistant AI Error:', error)
-    
+
     if (error instanceof Error) {
       if (error.message.includes('API key')) {
         return NextResponse.json(
@@ -173,7 +184,7 @@ Give constructive suggestions for improvement in academic writing style.`
           { status: 401 }
         )
       }
-      
+
       if (error.message.includes('quota') || error.message.includes('limit')) {
         return NextResponse.json(
           { error: 'API quota exceeded. Please try again later.' },
@@ -183,7 +194,7 @@ Give constructive suggestions for improvement in academic writing style.`
     }
 
     return NextResponse.json(
-      { 
+      {
         error: 'Failed to generate writing suggestions. Please try again.',
         details: process.env.NODE_ENV === 'development' ? error : undefined
       },

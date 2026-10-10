@@ -8,8 +8,6 @@ import {
   Users, 
   Star, 
   Clock, 
-  Award, 
-  Filter,
   ExternalLink,
   Bell,
   Brain,

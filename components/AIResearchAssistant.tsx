@@ -1,7 +1,7 @@
 'use client'
 import { useState, useRef, useEffect } from 'react'
-import { Send, Mic, MicOff, FileText, BarChart3, Users, Lightbulb, Download, Copy, Trash2, Bot, User } from 'lucide-react'
-import { useAuth } from '@/contexts/AuthContext'
+import { Send, Mic, MicOff, FileText, BarChart3, Users, Lightbulb, Download, Copy, Trash2, Bot, User, LucideIcon } from 'lucide-react'
+import { useUser } from '@clerk/nextjs'
 
 interface Message {
   id: string
@@ -14,17 +14,17 @@ interface Message {
 interface ResearchTool {
   id: string
   name: string
-  icon: any
+  icon: LucideIcon
   description: string
   prompt: string
 }
 
-export default function AIResearchAssistant() {
+export function AIResearchAssistant() {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
       type: 'ai',
-      content: 'Hello! I\'m your AI Research Assistant powered by Gemini 2.5 Flash. I can help you with:\n\n• **Literature Reviews** - Analyze papers and find research gaps\n• **Writing Assistance** - Improve academic writing and structure  \n• **Data Analysis** - Interpret results and suggest methodologies\n• **Citation Help** - Format references and suggest relevant papers\n• **Research Planning** - Create timelines and identify opportunities\n\nWhat would you like to work on today?',
+      content: 'Hello! I\'m your AI Research Assistant powered by Gemini 3.8 Flash. I can help you with:\n\n• **Literature Reviews** - Analyze papers and find research gaps\n• **Writing Assistance** - Improve academic writing and structure  \n• **Data Analysis** - Interpret results and suggest methodologies\n• **Citation Help** - Format references and suggest relevant papers\n• **Research Planning** - Create timelines and identify opportunities\n\nWhat would you like to work on today?',
       timestamp: new Date(),
       category: 'general'
     }
@@ -35,7 +35,7 @@ export default function AIResearchAssistant() {
   const [isListening, setIsListening] = useState(false)
   const [selectedTool, setSelectedTool] = useState<string | null>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
-  const { user } = useAuth()
+  const { user } = useUser()
 
   const researchTools: ResearchTool[] = [
     {
@@ -86,12 +86,14 @@ export default function AIResearchAssistant() {
         body: JSON.stringify({
           message: userMessage,
           userId: user?.id,
+          userName: user?.firstName || user?.fullName || 'Researcher',
           context: messages.slice(-5).map(m => `${m.type}: ${m.content}`).join('\n')
         }),
       })
 
       if (!response.ok) {
-        throw new Error('Failed to get AI response')
+        const errorData = await response.json().catch(() => ({}))
+        throw new Error(errorData.error || 'Failed to get AI response')
       }
 
       const data = await response.json()
@@ -197,7 +199,7 @@ export default function AIResearchAssistant() {
               </div>
               <div>
                 <h1 className="text-3xl font-bold text-gray-900">AI Research Laboratory</h1>
-                <p className="text-gray-600">Powered by Google Gemini 2.5 Flash • Real-time AI assistance</p>
+                <p className="text-gray-600">Powered by Google Gemini • Real-time AI assistance</p>
               </div>
             </div>
             <div className="flex gap-2">
@@ -223,7 +225,11 @@ export default function AIResearchAssistant() {
           {/* Research Tools Sidebar */}
           <div className="lg:col-span-1">
             <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Research Tools</h3>
+              <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                <FileText className="h-5 w-5 text-blue-600" />
+                Research Tools
+              </h3>
+              
               <div className="space-y-3">
                 {researchTools.map((tool) => {
                   const Icon = tool.icon
@@ -259,7 +265,7 @@ export default function AIResearchAssistant() {
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-600">AI Model:</span>
-                    <span className="font-medium">Gemini 2.5</span>
+                    <span className="font-medium">Gemini</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-600">Status:</span>
@@ -381,7 +387,7 @@ export default function AIResearchAssistant() {
                 </div>
                 
                 <div className="mt-3 text-xs text-gray-500 text-center">
-                  Press Enter to send • Shift+Enter for new line • Powered by Gemini 2.5 Flash
+                  Press Enter to send • Shift+Enter for new line • Powered by Google Gemini
                 </div>
               </div>
             </div>
@@ -391,3 +397,5 @@ export default function AIResearchAssistant() {
     </div>
   )
 }
+
+export default AIResearchAssistant

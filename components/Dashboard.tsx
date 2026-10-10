@@ -1,8 +1,8 @@
 'use client'
 // import MainLayout from '@/components/MainLayout'
 import { 
-  FileText, Calendar, Users, Sparkles, TrendingUp, 
-  Clock, Target, Award, ArrowUpRight, MoreHorizontal
+  FileText, Calendar, Users, Sparkles, 
+  Clock, Target, MoreHorizontal
 } from 'lucide-react'
 
 export default function Dashboard() {
@@ -98,9 +98,9 @@ export default function Dashboard() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Research Dashboard</h1>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-black">Research Dashboard</h1>
             <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-              Welcome back! Here's your research overview.
+              Welcome back! Here&apos;s your research overview.
             </p>
           </div>
           <div className="mt-4 sm:mt-0 flex gap-3">
